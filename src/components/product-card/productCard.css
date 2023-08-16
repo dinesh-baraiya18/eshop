@@ -74,3 +74,8 @@
 .product-card .product-inner:hover .img-wrapper img {
   transform: scale(1);
 }
+
+.horizontalGrid .img-wrapper {
+  max-width: 200px;
+  width: 100%;
+}

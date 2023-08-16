@@ -138,6 +138,34 @@ li.dd-link:hover .dd-menu {
   overflow: hidden;
 }
 
+.searchbar-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 5px;
+  max-width: calc(1170px - 30px);
+  margin: auto;
+  border: 1px solid var(--theme-color);
+  margin: 10px auto;
+  overflow: hidden;
+}
+
+.searchbar-container input {
+  flex: 1;
+  border: 0;
+  padding: 10px;
+}
+
+.searchbar-container input:focus {
+  border: 0;
+  outline: none;
+}
+
+.search-close-icon path {
+  stroke: #fff;
+}
+
 @media (max-width:768px) {
   .navlink {
     display: none !important;
