@@ -194,6 +194,10 @@ h1 span, h2 span, h3 span, h4 span, h5 span, h6 span {
   color: var(--second-color);
 }
 
+.MuiList-root li {
+  text-transform: capitalize !important;
+}
+
 
 @media (max-width: 1200px) {
   :root {

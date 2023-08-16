@@ -35,7 +35,7 @@ const Home = () => {
                 <span className="subtitle">new</span>
                 <h2>Collection</h2>
               </div>
-              <Link to="/product-filter" className="d-flex gap-2">
+              <Link to="/shop" className="d-flex gap-2">
                 Show More
                 <AiOutlineArrowRight />
               </Link>

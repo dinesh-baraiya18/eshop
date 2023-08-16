@@ -112,7 +112,7 @@ const Cart = () => {
                         </div>
                         <div className="d-flex gap-3 align-items-center align-self-start">
                           <div className="price">
-                            ${quantity ? price * quantity : price}
+                            ${(quantity ? price * quantity : price).toFixed(2)}
                           </div>
                           <Button onClick={() => dispatch(removeToCartFun(id))}>
                             <AiOutlineDelete size={25} />

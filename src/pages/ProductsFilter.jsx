@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
+  Checkbox,
   Container,
   FormControl,
   FormControlLabel,
+  FormGroup,
   MenuItem,
   Radio,
   RadioGroup,
@@ -20,6 +22,8 @@ import ProductSkeleton from "../components/product-card/ProductSkeleton";
 import { CiGrid2H, CiGrid41 } from "react-icons/ci";
 import { fetchProductData } from "../redux/features/products/fetchProductsSlice";
 import Loader from "../components/Loader";
+import { toast } from "react-toastify";
+// import { AiFillStar } from "react-icons/ai";
 
 const minDistance = 10;
 
@@ -42,7 +46,7 @@ const ProductsFilter = () => {
 
   // states
   const [loadmore, setLoadMore] = useState(9);
-  const [age, setAge] = useState("");
+  const [sorting, setSorting] = useState("");
   const [pricerange, setPricerange] = useState([minPrice, maxPrice]);
   const [products, setProducts] = useState(allproductsData || []);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -52,6 +56,7 @@ const ProductsFilter = () => {
     if (allproductsData.length > 0) {
       setProducts(allproductsData);
     }
+    setSorting("");
   }, [allproductsData]);
 
   // get all category
@@ -59,7 +64,6 @@ const ProductsFilter = () => {
     "All",
     ...new Set(allproductsData.map((item) => item.category)),
   ];
-
   // handle Categories
   const handleCategories = (category) => {
     const filterBYCategory = allproductsData.filter(
@@ -87,7 +91,6 @@ const ProductsFilter = () => {
     });
     setProducts(filterProductByPrice);
   };
-
   // handelrange
   const handlePriceRange = (event, newValue, activeThumb) => {
     if (!Array.isArray(newValue)) {
@@ -119,8 +122,31 @@ const ProductsFilter = () => {
     return <div>{error.message}</div>;
   }
 
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  // Sort by
+  const selectChange = (event) => {
+    const getSortBy = event.target.value;
+
+    const sortFunctions = {
+      AtoZ: (a, b) => a.title.localeCompare(b.title),
+      ZtoA: (a, b) => b.title.localeCompare(a.title),
+      priceLowToHigh: (a, b) => a.price - b.price,
+      priceHighToLow: (a, b) => b.price - a.price,
+      rating: (a, b) => b.rating.rate - a.rating.rate,
+    };
+    const sortedProducts = [...products].sort(sortFunctions[getSortBy]);
+
+    setSorting(getSortBy);
+    setProducts(sortedProducts);
+  };
+
+  // handle Clear Filter
+  const handleClearFilter = () => {
+    setProducts(allproductsData);
+    setSorting("");
+    setSelectedCategory("All");
+    setHorizontalGrid(false);
+    setPricerange([minPrice, maxPrice]);
+    toast.success("All Filter Cleared");
   };
 
   return (
@@ -191,16 +217,31 @@ const ProductsFilter = () => {
                   max={maxPrice}
                 />
               </div>
-              <div className="filter-div mt-3">
+              {/* <div className="filter-div rating mt-3">
                 <label>rating</label>
-                <div>*</div>
-                <div>**</div>
-                <div>***</div>
-                <div>****</div>
-                <div>*****</div>
-              </div>
+                <FormGroup>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label={
+                      <>
+                        <AiFillStar />
+                        <AiFillStar />
+                        <AiFillStar />
+                        <AiFillStar />
+                        <AiFillStar />
+                      </>
+                    }
+                    labelPlacement="start"
+                  />
+                </FormGroup>
+              </div> */}
               <div className="text-center mt-4">
-                <Button variant="contained" color="secondary" className="w-100">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  className="w-100"
+                  onClick={handleClearFilter}
+                >
                   Clear Filter
                 </Button>
               </div>
@@ -222,24 +263,34 @@ const ProductsFilter = () => {
                     </Button>
                   </div>
                 </div>
-                <FormControl size="small" sx={{ m: 1, minWidth: 120 }}>
+                <FormControl
+                  size="small"
+                  className="sortting-select"
+                  sx={{ m: 1, minWidth: 120 }}
+                >
                   <Select
-                    value={age}
-                    onChange={handleChange}
+                    value={sorting}
+                    onChange={selectChange}
                     displayEmpty
-                    inputProps={{ "aria-label": "Without label" }}
+                    // inputProps={{ "aria-label": "Without label" }}
                   >
                     <MenuItem value="">
                       <span>Sort</span>
                     </MenuItem>
-                    <MenuItem value={10}>Ten</MenuItem>
-                    <MenuItem value={20}>Twenty</MenuItem>
-                    <MenuItem value={30}>Thirty</MenuItem>
+                    <MenuItem value={"AtoZ"}>Name: A-Z</MenuItem>
+                    <MenuItem value={"ZtoA"}>Name: Z-A</MenuItem>
+                    <MenuItem value={"priceLowToHigh"}>
+                      price: low to high
+                    </MenuItem>
+                    <MenuItem value={"priceHighToLow"}>
+                      price: high to low
+                    </MenuItem>
+                    <MenuItem value={"rating"}> High Rating</MenuItem>
                   </Select>
                 </FormControl>
               </div>
               {horizontalGrid ? (
-                <Row>
+                <Row className="gap-3">
                   {loading
                     ? Array.from({ length: 9 }).map((_, index) => (
                         <Col xs={12} key={index}>
@@ -248,7 +299,10 @@ const ProductsFilter = () => {
                       ))
                     : products.slice(0, loadmore).map((product) => (
                         <Col xs={12} key={product.id}>
-                          <ProductCard product={product} />
+                          <ProductCard
+                            product={product}
+                            horizontalGrid={horizontalGrid}
+                          />
                         </Col>
                       ))}
                   {products.length >= loadmore && (
@@ -274,7 +328,10 @@ const ProductsFilter = () => {
                       ))
                     : products.slice(0, loadmore).map((product) => (
                         <Col xs={12} sm={12} md={6} lg={4} key={product.id}>
-                          <ProductCard product={product} />
+                          <ProductCard
+                            product={product}
+                            horizontalGrid={horizontalGrid}
+                          />
                         </Col>
                       ))}
                   {products.length >= loadmore && (
@@ -335,5 +392,12 @@ const FilterSection = styled.section`
       color: var(--second-color) !important;
       text-decoration: underline;
     }
+  }
+  .rating .MuiFormGroup-root label {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-left: 0;
   }
 `;
