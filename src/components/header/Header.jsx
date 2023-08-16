@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import styled from "@emotion/styled";
 import "./header.css";
 import {
@@ -14,6 +14,8 @@ import {
   Button,
   Badge,
   Dialog,
+  Slide,
+  IconButton,
 } from "@mui/material";
 import { Link, NavLink } from "react-router-dom";
 import { CiSearch, CiUser, CiHeart, CiShoppingCart } from "react-icons/ci";
@@ -54,14 +56,18 @@ const CustomToolbar = styled(Toolbar)`
   padding: 0 !important;
 `;
 
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const navLinks = [
   {
     name: "home",
     path: "/",
   },
   {
-    name: "category",
-    path: "/category",
+    name: "shop",
+    path: "/shop",
   },
   {
     name: "about",
@@ -87,7 +93,15 @@ const Header = () => {
     loginShow: false,
   });
   const [state, setState] = useState(false);
+  const [openSearch, setopenSearch] = useState(false);
 
+  const handleSearchOpen = () => {
+    setopenSearch(true);
+  };
+
+  const handleSearchClose = () => {
+    setopenSearch(false);
+  };
   // get cart  and wishlist product Quantity
   const { inCartProducts } = useSelector((state) => state.inCartProducts);
   const { wishlistProducts } = useSelector((state) => state.wishlistProducts);
@@ -167,7 +181,7 @@ const Header = () => {
                 ))}
               </ul>
               <ul className="right-side d-flex gap-3">
-                <li>
+                <li onClick={handleSearchOpen}>
                   <CiSearch />
                 </li>
                 <li>
@@ -303,6 +317,33 @@ const Header = () => {
           )}
         </Dialog>
       ) : null}
+
+      <Dialog
+        fullScreen
+        open={openSearch}
+        onClose={handleSearchClose}
+        TransitionComponent={Transition}
+      >
+        <AppBar sx={{ position: "relative" }}>
+          <Toolbar>
+            <IconButton
+              edge="start"
+              color="inherit"
+              onClick={handleSearchClose}
+              aria-label="close"
+              className="search-close-icon"
+            >
+              <GrClose />
+            </IconButton>
+            <div className="searchbar-container">
+              <input type="text" placeholder="Search Here..." />
+              <Button variant="contained" color="secondary">
+                Seach
+              </Button>
+            </div>
+          </Toolbar>
+        </AppBar>
+      </Dialog>
     </>
   );
 };

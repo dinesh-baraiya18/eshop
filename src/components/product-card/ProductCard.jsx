@@ -20,7 +20,7 @@ import { auth } from "../../firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { toast } from "react-toastify";
 
-const ProductCard = ({ product, inWishlist }) => {
+const ProductCard = ({ product, inWishlist, horizontalGrid }) => {
   const [wishlistIcon, setWishlistIcon] = useState(false);
   const { id, image, price, rating, title } = product;
   const dispatch = useDispatch();
@@ -47,7 +47,6 @@ const ProductCard = ({ product, inWishlist }) => {
       }
     });
   };
-
   return (
     <div className="product-card">
       <Card className="product-inner">
@@ -57,33 +56,45 @@ const ProductCard = ({ product, inWishlist }) => {
             {wishlistIcon || inWishlist ? <GoHeartFill /> : <GoHeart />}
           </Button>
         </div>
-        <Link to={`/product/${id}`} className="img-wrapper">
-          <img src={image} alt="product img" />
-        </Link>
-        <CardContent>
-          <Typography gutterBottom component="div" className="product-title">
-            <Link to={`/product/${id}`}>{title}</Link>
-          </Typography>
-          <div className="rating d-flex align-items-center gap-2">
-            <Rating
-              name="rating"
-              defaultValue={rating.rate}
-              precision={0.5}
-              readOnly
-            />
-            <span style={{ lineHeight: 1 }}>{`(${rating.count})`}</span>
+        <div
+          className={
+            horizontalGrid ? " horizontalGrid d-flex align-items-center" : ""
+          }
+        >
+          <Link to={`/product/${id}`} className="img-wrapper">
+            <img src={image} alt="product img" />
+          </Link>
+          <div style={{ flex: 1 }}>
+            <CardContent>
+              <Typography
+                gutterBottom
+                component="div"
+                className="product-title"
+              >
+                <Link to={`/product/${id}`}>{title}</Link>
+              </Typography>
+              <div className="rating d-flex align-items-center gap-2">
+                <Rating
+                  name="rating"
+                  defaultValue={rating.rate}
+                  precision={0.5}
+                  readOnly
+                />
+                <span style={{ lineHeight: 1 }}>{`(${rating.count})`}</span>
+              </div>
+            </CardContent>
+            <CardActions className="justify-content-between p-3">
+              <div className="price"> ${price}</div>
+              <Button
+                variant="contained"
+                className="btn"
+                onClick={() => dispatch(addToCartFun(product))}
+              >
+                Add To Cart
+              </Button>
+            </CardActions>
           </div>
-        </CardContent>
-        <CardActions className="justify-content-between">
-          <div className="price"> ${price}</div>
-          <Button
-            variant="contained"
-            className="btn"
-            onClick={() => dispatch(addToCartFun(product))}
-          >
-            Add To Cart
-          </Button>
-        </CardActions>
+        </div>
       </Card>
     </div>
   );
